@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use Exception;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -48,7 +49,28 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $data = $request->validate([
+                'name' => 'required|string|max:255',
+                'birthdate' => 'required|date',
+                'email' => 'required|email|unique:students,email',
+            ]);
+            // $students = Student::create($request);
+
+            $student = Student::create($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إضافة الطالب بنجاح',
+                'data' => $student,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء إضافة الطالب',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -93,6 +115,14 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        //
+    
+        
+        try{
+            Student::delete($student);
+            return response()->json([''=>'',''=>'']);
+
+        }catch(Exception $e){
+            return response()->json([''=>'',''=>'']);
+        }
     }
 }
